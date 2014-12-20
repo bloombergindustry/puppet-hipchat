@@ -19,7 +19,12 @@ Puppet::Reports.register_report(:hipchat) do
   HIPCHAT_STATUSES = Array(config[:hipchat_statuses] || 'failed')
   HIPCHAT_PUPPETBOARD = config[:hipchat_puppetboard]
   HIPCHAT_DASHBOARD = config[:hipchat_dashboard]
-  HIPCHAT_MAX_MESSAGE_LENGTH = config[:hipchat_max_message_length] || 200
+  HIPCHAT_MAX_MESSAGE_LENGTH = config[:hipchat_max_message_length] || 5000
+
+  # According to https://www.hipchat.com/docs/api/method/rooms/message
+  if HIPCHAT_MAX_MESSAGE_LENGTH > 10000
+    HIPCHAT_MAX_MESSAGE_LENGTH = 10000
+  end
 
   # set the default colors if not defined in the config
   HIPCHAT_FAILED_COLOR = config[:failed_color] || 'red'
