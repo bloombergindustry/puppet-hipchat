@@ -8,3 +8,4 @@
   - failed
 :hipchat_puppetboard: NONE
 :hipchat_dashboard: NONE
+:hipchat_max_message_length: 200
