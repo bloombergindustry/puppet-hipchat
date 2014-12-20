@@ -6,4 +6,5 @@
 :hipchat_proxy: 'http://username:password@proxy_host:8080'
 :hipchat_statuses:
   - failed
-:hipchat_puppetboard: 'false'
+:hipchat_puppetboard: NONE
+:hipchat_dashboard: NONE
