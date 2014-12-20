@@ -66,34 +66,36 @@ Puppet::Reports.register_report(:hipchat) do
 
     if (HIPCHAT_STATUSES.include?(self.status) || HIPCHAT_STATUSES.include?('all')) && !disabled
       Puppet.debug "Sending status for #{self.host} to Hipchat channel #{HIPCHAT_ROOM}"
-        msg = "Puppet run for #{self.host} #{emote(self.status)} #{self.status} at #{Time.now.asctime} on #{self.configuration_version} in #{self.environment}"
-        if HIPCHAT_PUPPETBOARD != "NONE"
-          msg << "\n#{HIPCHAT_PUPPETBOARD}/report/latest/#{self.host}"
-        elsif HIPCHAT_DASHBOARD != "NONE"
-          msg << "\n#{HIPCHAT_DASHBOARD}/nodes/#{self.host}/view"
-        end
+      msg = "Puppet run for #{self.host} #{emote(self.status)} #{self.status} at #{Time.now.asctime} on #{self.configuration_version} in #{self.environment}"
+      if HIPCHAT_PUPPETBOARD != "NONE"
+        msg << "\n#{HIPCHAT_PUPPETBOARD}/report/latest/#{self.host}"
+      elsif HIPCHAT_DASHBOARD != "NONE"
+        msg << "\n#{HIPCHAT_DASHBOARD}/nodes/#{self.host}/view"
+      end
         
-        if self.status == 'changed'
-          self.resource_statuses.each do |theresource,resource_status|
-            if resource_status.change_count > 0
-              msg << "\n  Resource: #{resource_status.title}"
-              msg << " Type: #{resource_status.resource_type}"            
-            end
+      if self.status == 'changed'
+        self.resource_statuses.each do |theresource,resource_status|
+          if resource_status.change_count > 0
+            msg << "\n  Resource: #{resource_status.title}"
+            msg << " Type: #{resource_status.resource_type}"
           end
-        elsif self.status == 'failed'
-          output = []
-          self.logs.each do |log|
-            output << log
-          end
-          msg << output.join("\n")
         end
-        
-        if HIPCHAT_PROXY
-          client = HipChat::Client.new(HIPCHAT_API, :http_proxy => HIPCHAT_PROXY)
-        else
-          client = HipChat::Client.new(HIPCHAT_API)
+      elsif self.status == 'failed'
+        output = []
+        self.logs.each do |log|
+          output << log
         end
-        client[HIPCHAT_ROOM].send('Puppet', msg, :notify => HIPCHAT_NOTIFY, :color => color(self.status), :message_format => 'text')
+        msg << output.join("\n")
+      end
+
+      if HIPCHAT_PROXY
+        client = HipChat::Client.new(HIPCHAT_API, :http_proxy => HIPCHAT_PROXY)
+      else
+        client = HipChat::Client.new(HIPCHAT_API)
+      end
+
+      client[HIPCHAT_ROOM].send('Puppet', msg, :notify => HIPCHAT_NOTIFY, :color => color(self.status), :message_format => 'text')
+
     end
   end
 end
