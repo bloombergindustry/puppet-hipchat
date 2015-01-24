@@ -15,6 +15,7 @@ class puppet_hipchat (
   $group        = $puppet_hipchat::params::group,
   $puppetboard  = $puppet_hipchat::params::puppetboard,
   $dashboard    = $puppet_hipchat::params::dashboard,
+  $exclude      = [ 'NONE' ],
 ) inherits puppet_hipchat::params {
 
   file { $config_file:
@@ -22,7 +23,7 @@ class puppet_hipchat (
     owner   => $owner,
     group   => $group,
     mode    => '0440',
-    content => template('puppet_hipchat/hipchat.yaml.erb'),
+    content => template("${module_name}/hipchat.yaml.erb"),
   }
 
   package { $package_name:

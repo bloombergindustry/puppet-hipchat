@@ -20,6 +20,7 @@ Puppet::Reports.register_report(:hipchat) do
   HIPCHAT_PUPPETBOARD = config[:hipchat_puppetboard]
   HIPCHAT_DASHBOARD = config[:hipchat_dashboard]
   HIPCHAT_MAX_MESSAGE_LENGTH = config[:hipchat_max_message_length] || 5000
+  HIPCHAT_EXCLUDE = Array(config[:hipchat_exclude] || 'NONE')
 
   # According to https://www.hipchat.com/docs/api/method/rooms/message
   if HIPCHAT_MAX_MESSAGE_LENGTH > 10000
@@ -81,7 +82,10 @@ Puppet::Reports.register_report(:hipchat) do
   def process
     # Disabled check here to ensure it is checked for every report
     disabled = File.exists?(DISABLED_FILE)
-
+    
+    # do we have changes to report
+    do_report = 0
+    
     if (HIPCHAT_STATUSES.include?(self.status) || HIPCHAT_STATUSES.include?('all')) && !disabled
       Puppet.debug "Sending status for #{self.host} to Hipchat channel #{HIPCHAT_ROOM}"
       msg = "Puppet run for #{self.host} #{emote(self.status)} #{self.status} at #{Time.now.asctime} on #{self.configuration_version} in #{self.environment}"
@@ -94,8 +98,11 @@ Puppet::Reports.register_report(:hipchat) do
       if self.status == 'changed'
         self.resource_statuses.each do |theresource,resource_status|
           if resource_status.change_count > 0
-            msg << "\n  Resource: #{resource_status.title}"
-            msg << " Type: #{resource_status.resource_type}"
+            unless HIPCHAT_EXCLUDE.include?(resource_status.resource_type)
+              msg << "\n  Resource: #{resource_status.title}"
+              msg << " Type: #{resource_status.resource_type}"
+              do_report = 1
+            end
           end
         end
       elsif self.status == 'failed'
@@ -104,20 +111,23 @@ Puppet::Reports.register_report(:hipchat) do
           output << log
         end
         msg << output.join("\n")
+        do_report = 1
       end
 
-      if HIPCHAT_PROXY
-        client = HipChat::Client.new(HIPCHAT_API, :http_proxy => HIPCHAT_PROXY)
-      else
-        client = HipChat::Client.new(HIPCHAT_API)
-      end
+      if do_report == 1
+        if HIPCHAT_PROXY
+          client = HipChat::Client.new(HIPCHAT_API, :http_proxy => HIPCHAT_PROXY)
+        else
+          client = HipChat::Client.new(HIPCHAT_API)
+        end
 
-      client[HIPCHAT_ROOM].send('Puppet',
+        client[HIPCHAT_ROOM].send('Puppet',
                                 truncate(msg, HIPCHAT_MAX_MESSAGE_LENGTH),
                                 :notify => HIPCHAT_NOTIFY,
                                 :color => color(self.status),
                                 :message_format => 'text')
 
+      end
     end
   end
 end

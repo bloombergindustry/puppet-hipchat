@@ -10,3 +10,7 @@
 :hipchat_puppetboard: <%= scope.lookupvar('puppet_hipchat::puppetboard') %>
 :hipchat_dashboard: <%= scope.lookupvar('puppet_hipchat::dashboard') %>
 :hipchat_max_message_length: <%= scope.lookupvar('puppet_hipchat::hipchat_max_message_length') %>
+:hipchat_exclude:
+<% scope.lookupvar('puppet_hipchat::exclude').each do |type| -%>
+  - <%= type %>
+<% end -%>
