@@ -48,6 +48,6 @@ class puppet_hipchat (
   }
 
   Service <| title == $master_service |> {
-    subscribe +> Class[$title],
+    subscribe +> [Package[$package_name], Ini_subsetting['puppet_hipchat report']],
   }
 }
