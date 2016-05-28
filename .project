@@ -3,6 +3,8 @@
 	<name>hipchat</name>
 	<comment></comment>
 	<projects>
+		<project>inifile</project>
+		<project>stdlib</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
