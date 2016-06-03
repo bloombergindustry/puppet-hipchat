@@ -86,16 +86,19 @@ Puppet::Reports.register_report(:hipchat) do
     # do we have changes to report
     do_report = 0
     
-    if (HIPCHAT_STATUSES.include?(self.status) || HIPCHAT_STATUSES.include?('all')) && !disabled
+    status = self.status
+    status = 'failed' if self.metrics['resources'].values.find_index { |x| x[0] == 'failed_to_restart' && x[2] > 0 }
+
+    if (HIPCHAT_STATUSES.include?(status) || HIPCHAT_STATUSES.include?('all')) && !disabled
       Puppet.debug "Sending status for #{self.host} to Hipchat channel #{HIPCHAT_ROOM}"
-      msg = "Puppet run for #{self.host} #{emote(self.status)} #{self.status} at #{Time.now.asctime} on #{self.configuration_version} in #{self.environment}"
+      msg = "Puppet run for #{self.host} #{emote(status)} #{status} at #{Time.now.asctime} on #{self.configuration_version} in #{self.environment}"
       if HIPCHAT_PUPPETBOARD != "NONE"
         msg << "\n#{HIPCHAT_PUPPETBOARD}/report/latest/#{self.host}"
       elsif HIPCHAT_DASHBOARD != "NONE"
         msg << "\n#{HIPCHAT_DASHBOARD}/nodes/#{self.host}/view"
       end
         
-      if self.status == 'changed'
+      if status == 'changed'
         self.resource_statuses.each do |theresource,resource_status|
           if resource_status.change_count > 0
             unless HIPCHAT_EXCLUDE.include?(resource_status.resource_type)
@@ -105,7 +108,7 @@ Puppet::Reports.register_report(:hipchat) do
             end
           end
         end
-      elsif self.status == 'failed'
+      elsif status == 'failed'
         output = []
         self.logs.each do |log|
           output << log
@@ -124,7 +127,7 @@ Puppet::Reports.register_report(:hipchat) do
         client[HIPCHAT_ROOM].send('Puppet',
                                 truncate(msg, HIPCHAT_MAX_MESSAGE_LENGTH),
                                 :notify => HIPCHAT_NOTIFY,
-                                :color => color(self.status),
+                                :color => color(status),
                                 :message_format => 'text')
 
       end
