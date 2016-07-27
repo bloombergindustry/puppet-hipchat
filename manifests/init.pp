@@ -5,6 +5,7 @@
 class puppet_hipchat (
   $api_key,
   $room,
+  $from           = 'Puppet',
   $enabled        = true,
   $notify_color   = 'red',
   $notify_room    = false,

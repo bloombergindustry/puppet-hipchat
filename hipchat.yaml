@@ -1,6 +1,7 @@
 ---
 :hipchat_api: 'apikey'
 :hipchat_room: 'roomname'
+:hipchat_from: 'Puppet'
 :hipchat_notify_color: 'red'
 :hipchat_notify: 'false'
 :hipchat_proxy: 'http://username:password@proxy_host:8080'

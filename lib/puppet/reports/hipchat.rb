@@ -21,6 +21,7 @@ Puppet::Reports.register_report(:hipchat) do
   HIPCHAT_DASHBOARD = config[:hipchat_dashboard]
   HIPCHAT_MAX_MESSAGE_LENGTH = config[:hipchat_max_message_length] || 5000
   HIPCHAT_EXCLUDE = Array(config[:hipchat_exclude] || 'NONE')
+  HIPCHAT_FROM = config[:hipchat_from] || 'Puppet'
 
   # According to https://www.hipchat.com/docs/api/method/rooms/message
   if HIPCHAT_MAX_MESSAGE_LENGTH > 10000
@@ -124,7 +125,7 @@ Puppet::Reports.register_report(:hipchat) do
           client = HipChat::Client.new(HIPCHAT_API)
         end
 
-        client[HIPCHAT_ROOM].send('Puppet',
+        client[HIPCHAT_ROOM].send(HIPCHAT_FROM,
                                 truncate(msg, HIPCHAT_MAX_MESSAGE_LENGTH),
                                 :notify => HIPCHAT_NOTIFY,
                                 :color => color(status),
