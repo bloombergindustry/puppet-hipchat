@@ -9,7 +9,7 @@ class puppet_hipchat (
   $enabled                    = true,
   $notify_color               = 'red',
   $notify_room                = false,
-  $statuses                   = ['failed'],
+  $statuses                   = ['changed','failed'],
   $config_file                = $puppet_hipchat::params::config_file,
   $package_name               = $puppet_hipchat::params::package_name,
   $provider                   = $puppet_hipchat::params::provider,
