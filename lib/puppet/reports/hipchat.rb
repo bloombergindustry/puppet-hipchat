@@ -81,6 +81,8 @@ Puppet::Reports.register_report(:hipchat) do
   end
 
   def process
+    # Puppet.info "HIP Inspect: #{self.inspect}"
+
     # Disabled check here to ensure it is checked for every report
     disabled = File.exists?(DISABLED_FILE)
     
@@ -88,7 +90,7 @@ Puppet::Reports.register_report(:hipchat) do
     do_report = 0
     
     status = self.status
-    status = 'failed' if self.metrics['resources'].values.find_index { |x| x[0] == 'failed_to_restart' && x[2] > 0 }
+    status = 'failed' if self.metrics.include?('resources') && self.metrics['resources'].values.find_index { |x| x[0] == 'failed_to_restart' && x[2] > 0 }
 
     if (HIPCHAT_STATUSES.include?(status) || HIPCHAT_STATUSES.include?('all')) && !disabled
       Puppet.debug "Sending status for #{self.host} to Hipchat channel #{HIPCHAT_ROOM}"
