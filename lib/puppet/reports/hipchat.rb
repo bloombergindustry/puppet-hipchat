@@ -81,7 +81,7 @@ Puppet::Reports.register_report(:hipchat) do
   end
 
   def process
-    # Puppet.info "HIP Inspect: #{self.inspect}"
+    Puppet.info "HIP Inspect: #{self.inspect}"
 
     # Disabled check here to ensure it is checked for every report
     disabled = File.exists?(DISABLED_FILE)
