@@ -14,6 +14,7 @@ Puppet::Reports.register_report(:hipchat) do
   config = YAML.load_file(configfile)
 
   HIPCHAT_API = config[:hipchat_api]
+  HIPCHAT_API_VERSION = config[:hipchat_api_version] || 'v1'
   HIPCHAT_ROOM = config[:hipchat_room]
   HIPCHAT_NOTIFY = config[:hipchat_notify]
   HIPCHAT_STATUSES = Array(config[:hipchat_statuses] || 'failed')
@@ -122,9 +123,9 @@ Puppet::Reports.register_report(:hipchat) do
 
       if do_report == 1
         if HIPCHAT_PROXY
-          client = HipChat::Client.new(HIPCHAT_API, :http_proxy => HIPCHAT_PROXY)
+          client = HipChat::Client.new(HIPCHAT_API, api_version: HIPCHAT_API_VERSION, :http_proxy => HIPCHAT_PROXY)
         else
-          client = HipChat::Client.new(HIPCHAT_API)
+          client = HipChat::Client.new(HIPCHAT_API, api_version: HIPCHAT_API_VERSION)
         end
 
         client[HIPCHAT_ROOM].send(HIPCHAT_FROM,
