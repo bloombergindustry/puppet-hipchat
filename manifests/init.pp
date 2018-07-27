@@ -11,7 +11,6 @@ class puppet_hipchat (
   $notify_room                = false,
   $statuses                   = ['changed','failed'],
   $config_file                = $puppet_hipchat::params::config_file,
-  $package_name               = $puppet_hipchat::params::package_name,
   $provider                   = $puppet_hipchat::params::provider,
   $master_service             = $puppet_hipchat::params::master_service,
   $owner                      = $puppet_hipchat::params::owner,
@@ -30,9 +29,15 @@ class puppet_hipchat (
     content => template("${module_name}/hipchat.yaml.erb"),
   }
 
-  package { $package_name:
-    ensure   => installed,
+  package { 'httparty':
+    ensure   => '~> 0.14.0',
     provider => $provider,
+  }
+
+  package { 'hipchat':
+    ensure   => '~> 1.5.0',
+    provider => $provider,
+    require  => Package['httparty'],
   }
 
   Ini_subsetting {

@@ -4,7 +4,6 @@
 #
 class puppet_hipchat::params {
 
-  $package_name = 'hipchat'
   $puppetboard  = 'NONE'
   $dashboard    = 'NONE'
   $config_file  = "${::settings::confdir}/hipchat.yaml"
