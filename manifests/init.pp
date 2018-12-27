@@ -21,23 +21,25 @@ class puppet_hipchat (
   $hipchat_max_message_length = 5000,
 ) inherits puppet_hipchat::params {
 
-  file { $config_file:
-    ensure  => file,
-    owner   => $owner,
-    group   => $group,
-    mode    => '0440',
-    content => template("${module_name}/hipchat.yaml.erb"),
-  }
+  if $enabled {
+    file { $config_file:
+      ensure  => file,
+      owner   => $owner,
+      group   => $group,
+      mode    => '0440',
+      content => template("${module_name}/hipchat.yaml.erb"),
+    }
 
-  package { 'httparty':
-    ensure   => '~> 0.14.0',
-    provider => $provider,
-  }
+    package { 'httparty':
+      ensure   => '~> 0.14.0',
+      provider => $provider,
+    }
 
-  package { 'hipchat':
-    ensure   => '~> 1.5.0',
-    provider => $provider,
-    require  => Package['httparty'],
+    package { 'hipchat':
+      ensure   => '~> 1.5.0',
+      provider => $provider,
+      require  => Package['httparty'],
+    }
   }
 
   Ini_subsetting {
