@@ -3,8 +3,8 @@
 # Send Puppet report information to HipChat
 #
 class puppet_hipchat (
-  $api_key,
-  $room,
+  $api_key                    = undef,
+  $room                       = undef,
   $from                       = 'Puppet',
   $enabled                    = true,
   $notify_color               = 'red',
